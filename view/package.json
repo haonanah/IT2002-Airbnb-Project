@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/jsonfile": "^6.1.1",
     "apisauce": "^2.1.6",
+    "browserify-fs": "^1.0.0",
     "ip": "^1.1.8",
+    "jsonfile": "^6.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.10.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.1",

@@ -1,5 +1,6 @@
 # ? Cross-origin Resource Sharing - here it allows the view and core applications deployed on different ports to communicate. No need to know anything about it since it's only used once
 from flask_cors import CORS, cross_origin
+from flask import render_template
 # ? Python's built-in library for JSON operations. Here, is used to convert JSON strings into Python dictionaries and vice-versa
 import json
 # ? flask - library used to write REST API endpoints (functions in simple words) to communicate with the client (view) application's interactions
@@ -10,7 +11,7 @@ from flask import Flask, request, Response
 import sqlalchemy
 # ? Just a class to help while coding by suggesting methods etc. Can be totally removed if wanted, no change
 from typing import Dict
-
+from flask import jsonify
 
 # ? web-based applications written in flask are simply called apps are initialized in this format from the Flask base class. You may see the contents of `__name__` by hovering on it while debugging if you're curious
 app = Flask(__name__)
@@ -37,9 +38,16 @@ data_types = {
     'time': 'TIME',
 }
 
+headings = ('Name','Role','Salary')
+data = (('Rolf','Engineer','42'),
+('Amy','Owner','55'),
+('Bob','Security','23'))
+
+@app.route('/')
+def table():
+    return render_template('table.html',headings=headings, data=data)
+
 # ? @app.get is called a decorator, from the Flask class, converting a simple python function to a REST API endpoint (function)
-
-
 @app.get("/table")
 def get_relation():
     # ? This method returns the contents of a table whose name (table-name) is given in the url `http://localhost:port/table?name=table-name`
@@ -99,6 +107,36 @@ def insert_into_table():
         db.commit()
         return Response(statement.text)
     except Exception as e:
+        print(e)
+        db.rollback()
+        return Response(str(e), 403)
+
+@app.post("/table-retrieve")
+# ? a flask decorator listening for POST requests at the url /table-insert and handles the entry insertion into the given table/relation
+# * You might wonder why PUT or a similar request header was not used here. Fundamentally, they act as POST. So the code was kept simple here
+def retrieve_data_from_table():
+    # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
+    data = request.data.decode()
+    try:
+        insertion = json.loads(data)
+        statement = generate_get_table_data_statement(insertion)
+        result = db.execute(statement)
+        # return json.dumps(result.fetchall()[0])
+        results = [list(row) for row in result.fetchall()]
+        return json.dumps(results)
+
+
+        # rows = [str(row) for row in result]
+        # json_data = json.dumps(rows)
+        # return jsonify(json_data)
+        # rows = [dict(row) for row in result]
+        # json_data = json.dumps(rows)
+        # return json_data
+        # for x in result.fetchall():
+        #     return json.dumps(x)
+        # db.commit()st
+        # return Response(statement.text)
+    except Exception as e:
         db.rollback()
         return Response(str(e), 403)
 
@@ -133,7 +171,20 @@ def delete_row():
     except Exception as e:
         db.rollback()
         return Response(str(e), 403)
-
+    
+@app.post("/delete-table")
+def delete_table():
+    data = request.data.decode()
+    try:
+        delete = json.loads(data) #{"name": "...."}
+        statement = delete_table_helper(delete["name"])
+        # statement = generate_delete_statement(delete)
+        db.execute(statement)
+        db.commit()
+        return Response(statement.text)
+    except Exception as e:
+        db.rollback()
+        return Response(str(e), 403)
 
 def generate_table_return_result(res):
     # ? An empty Python list to store the entries/rows/tuples of the relation/table
@@ -166,13 +217,17 @@ def generate_table_return_result(res):
     # ? Returns the stringified JSON object
     return json.dumps(output)
 
-
 def generate_delete_statement(details: Dict):
     # ? Fetches the entry id for the table name
     table_name = details["relationName"]
     id = details["deletionId"]
     # ? Generates the deletion query for the given entry with the id
     statement = f"DELETE FROM {table_name} WHERE id={id};"
+    return sqlalchemy.text(statement)
+
+
+def delete_table_helper(table_name):
+    statement = f"DROP TABLE {table_name}"
     return sqlalchemy.text(statement)
 
 
@@ -222,6 +277,32 @@ def generate_insert_table_statement(insertion: Dict):
     statement = statement + column_names+" VALUES "+column_values+";"
     return sqlalchemy.text(statement)
 
+def generate_get_table_data_statement(insertion: Dict): 
+    #must check if other functions use this, as im only selecting username and password
+    # ? Fetching table name and the rows/tuples body object from the request
+    table_name = insertion["name"]
+    body = insertion["body"]
+    valueTypes = insertion["valueTypes"]
+
+    # ? Generating the default insert statement template
+    statement = f"SELECT username, password, role FROM {table_name} WHERE "
+
+    # ? Appending the entries with their corresponding columns
+    conditions = ""
+    for key, value in body.items():
+        if len(conditions) > 0:
+            conditions += " AND "
+        conditions += f"{key} = "
+        if valueTypes[key] == "TEXT" or valueTypes[key] == "TIME":
+            conditions += (f"\'{value}\'")
+        else:
+            conditions += (f"{value}")
+
+    # ? Combining it all into one statement and returning
+    #! You may try to expand it to multiple tuple insertion in another method
+    statement = statement + conditions+";"
+    return sqlalchemy.text(statement)
+
 
 def generate_create_table_statement(table: Dict):
     # ? First key is the name of the table
@@ -238,6 +319,40 @@ def generate_create_table_statement(table: Dict):
     statement = statement[:-1] + ");"
     return sqlalchemy.text(statement)
 
+@app.post("/table-search")
+# ? a flask decorator listening for POST requests at the url /table-update and handles the entry updates in the given table/relation
+def serach_table():
+    # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
+    data = request.data.decode()
+    try:
+        update = json.loads(data)
+        statement = generate_search_table_statement(update)
+        result = db.execute(statement)
+        # return json.dumps(result.fetchall()[0])
+        results = [list(row) for row in result.fetchall()]
+        return json.dumps(results)
+    except Exception as e:
+        db.rollback()
+        return Response(str(e), 403)
+
+def generate_search_table_statement(table: Dict):
+    # ? First key is the name of the table
+    # table_name = table["name"]
+    # ? Table body itself is a JSON object mapping field/column names to their values
+    search_string = table["searchString"]
+    # ? Default table creation template query is extended below. Note that we drop the existing one each time. You might improve this behavior if you will
+    # ! ID is the case of simhplicity
+    # statement = f"DROP TABLE IF EXISTS {table_name}; CREATE TABLE {table_name} (id serial NOT NULL PRIMARY KEY,"
+    statement = f"SELECT * from airbnb WHERE neighbourhood LIKE '%{search_string}%' OR room_type LIKE '%{search_string}%';"
+    # ? As stated above, column names and types are appended to the creation query from the mapped JSON object
+    # for key, value in table_body.items():
+    #     statement += (f"{key}"+" "+f"{value}"+",")
+    # ? closing the final statement (by removing the last ',' and adding ');' termination and returning it
+    # statement = statement[:-1] + ");"
+    return sqlalchemy.text(statement)
+
+
+
 # ? This method can be used by waitress-serve CLI 
 def create_app():
    return app
@@ -253,3 +368,16 @@ if __name__ == "__main__":
     # ? If you are willing to use waitress-serve command, please add `/home/sadm/.local/bin` to your ~/.bashrc
     # from waitress import serve
     # serve(app, host="0.0.0.0", port=PORT)
+
+
+
+
+# Search end point -> SQL selectt from 
+
+
+
+# implmend authentication -> register, login
+    # ? If you are willing to use waitress-serve command, please add `/home/sadm/.local/bin` to your ~/.bashrc
+
+
+

@@ -12,12 +12,12 @@ th {
     display: block;
     width: 100%;
 
-    #sub-view {
-        display: inline-block;
-        width: 50%;
-        float: left;
-        margin-bottom: 20px;
-    }
+    // #sub-view {
+    //     display: inline-block;
+    //     width: 50%;
+    //     float: left;
+    //     margin-bottom: 20px;
+    // }
 }
 
 // .field-rows {
@@ -96,4 +96,14 @@ p {
         display: flex;
         align-items: center;
     }
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
 }

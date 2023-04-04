@@ -1,9 +1,9 @@
 import apisauce from 'apisauce'
-import { RelationView } from './App'
+import { RelationView } from './pages/Admin'
 
 // ? REST API functions to communicate with your database backend
 // ? Machine IP - replace with your server's IP address; run `ifconfig` and take the first inet IP address (should be below ens32)
-const machineIP = "172.25.76.144"
+const machineIP = "172.25.77.203"
 const machinePort = "2222"
 const api = apisauce.create({
     baseURL: `http://${machineIP}:${machinePort}`,
@@ -48,6 +48,36 @@ export async function insertEntry(entry: any) {
     return false
 }
 
+export async function getEntry(entry: any) {
+    let res = await api.post("/table-retrieve", entry)
+    console.log(res)
+    if (res.ok) {
+        //to test
+        console.log(res.data)
+        console.log("Retrieved successfully!")
+        if (res.data) {
+            return res.data
+        }
+    }
+    alert("Failed to retrieve the given entry!")
+    return false
+}
+
+export async function searchEntry(entry: any) {
+    let res = await api.post("/table-search", entry)
+    console.log(res)
+    if (res.ok) {
+        //to test
+        console.log(res.data)
+        console.log("Retrieved successfully!")
+        if (res.data) {
+            return res.data
+        }
+    }
+    alert("Failed to retrieve the given entry!")
+    return false
+}
+
 export async function updateEntry(entry: any) {
     let res = await api.post("/table-update", entry)
     if (res.ok) {
@@ -66,4 +96,15 @@ export async function deleteEntry(deletionData: any) {
     }
     alert("Failed to delete the given entry!")
     return false
+}
+
+export async function deleteTable(tableName: any) {
+    let res = await api.post("/delete-table", {name: tableName})
+    if (res.ok) {
+        console.log("Deleted successfully!")
+        return true
+    }
+    alert("Failed to delete the given table!")
+    return false
+    
 }
