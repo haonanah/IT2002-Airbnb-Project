@@ -17,7 +17,6 @@ export interface RelationView {
 // ? In React, a function returning HTML script is called a component, 
 // ? and App is our main component, hosting the table editing menu and table view
 function User() {
-
   // ? state (currentRelationView) - is the JS/TS object holding the dynamic values
   // ? setState (setCurrentRelationView) - is the JS/TS method used to update the state object
   // ? our state `currentRelationView` holds the necessary data to display the requested table/relation
@@ -27,7 +26,6 @@ function User() {
     rows: []
   })
   //const [searchResults, setSearchResults] = useState<Array<{ [key: string]: any }>>([])
-
   useEffect(() => {
     getDatabaseData();
   }, [])
@@ -45,7 +43,7 @@ function User() {
     <div className="App">
       <div id="main-view">
         {/* Below component is the user edit menu to create/modify the required table. Refer to `handleRelationViewUpdate` to learn about props*/}
-        <UserView relationView={currentRelationView} setSearchResults={setSearchResults}/>
+        <UserView relationView={currentRelationView} setSearchResults={setSearchResults} onRelationChange={handleRelationViewUpdate}/>
         {/* TableView component is just for displaying the table on the right side of the view */}
         {/* <TableView relationView={currentRelationView} /> */}
       </div>
@@ -79,17 +77,13 @@ function User() {
     setCurrentRelationView(relationView)
     // airbnbdata = relationView.rows
   }
-
   function deleteTable() {
     setCurrentRelationView({
       columns: [],
       rows: []
     })
   }
-
-  function filterTable(column_name: string, input: string) {
-    
+  function filterTable(column_name: string, input: string) { 
   }
 }
-
 export default User

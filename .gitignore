@@ -14,6 +14,7 @@ dist-ssr
 
 # Editor directories and files
 .vscode/*
+.vscode-server/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -27,3 +28,6 @@ Pipfile.lock
 __pycache__
 nohup.out
 package-lock.json
+
+.local/*
+.npm/*
