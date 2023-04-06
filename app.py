@@ -38,10 +38,10 @@ data_types = {
     'time': 'TIME',
 }
 
-headings = ('Name','Role','Salary')
-data = (('Rolf','Engineer','42'),
-('Amy','Owner','55'),
-('Bob','Security','23'))
+# headings = ('Name','Role','Salary')
+# data = (('Rolf','Engineer','42'),
+# ('Amy','Owner','55'),
+# ('Bob','Security','23'))
 
 @app.route('/')
 def table():
@@ -124,8 +124,6 @@ def retrieve_data_from_table():
         # return json.dumps(result.fetchall()[0])
         results = [list(row) for row in result.fetchall()]
         return json.dumps(results)
-
-
         # rows = [str(row) for row in result]
         # json_data = json.dumps(rows)
         # return jsonify(json_data)
@@ -352,6 +350,44 @@ def generate_search_table_statement(table: Dict):
     return sqlalchemy.text(statement)
 
 
+@app.post("/table-filter")
+# ? a flask decorator listening for POST requests at the url /table-update and handles the entry updates in the given table/relation
+def filter_table():
+    # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
+    data = request.data.decode()
+    try:
+        filter = json.loads(data)
+        statement = generate_filter_table_statement(filter)
+        result = db.execute(statement)
+        results = [list(row) for row in result.fetchall()]
+        return json.dumps(results)
+    except Exception as e:
+        db.rollback()
+        return Response(str(e), 403)
+    
+    # try:
+    #     update = json.loads(data)
+    #     statement = generate_search_table_statement(update)
+    #     result = db.execute(statement)
+    #     # return json.dumps(result.fetchall()[0])
+    #     results = [list(row) for row in result.fetchall()]
+    #     return json.dumps(results)
+    
+def generate_filter_table_statement(table: Dict):
+    # ? First key is the name of the table
+    # table_name = table["name"]
+    # ? Table body itself is a JSON object mapping field/column names to their values
+    filter_string = table["price"]
+    # ? Default table creation template query is extended below. Note that we drop the existing one each time. You might improve this behavior if you will
+    # ! ID is the case of simhplicity
+    # statement = f"DROP TABLE IF EXISTS {table_name}; CREATE TABLE {table_name} (id serial NOT NULL PRIMARY KEY,"
+    statement = f"Select * from airbnb WHERE price < {filter_string} ;"
+    # ? As stated above, column names and types are appended to the creation query from the mapped JSON object
+    # for key, value in table_body.items():
+    #     statement += (f"{key}"+" "+f"{value}"+",")
+    # ? closing the final statement (by removing the last ',' and adding ');' termination and returning it
+    # statement = statement[:-1] + ");"
+    return sqlalchemy.text(statement)
 
 # ? This method can be used by waitress-serve CLI 
 def create_app():

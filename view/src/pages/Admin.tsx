@@ -84,7 +84,7 @@ function App() {
   }
 
   function filterTable(column_name: string, input: string) {
-
+    
   }
 }
 

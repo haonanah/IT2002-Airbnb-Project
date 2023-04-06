@@ -7,7 +7,7 @@ interface TableViewProps {
 const TableView = (props: TableViewProps) => {
     return (
         <div id="sub-view">
-            <p>The view of you relation:</p>
+            <p>Listings:</p>
             {
                 props.relationView.columns.length > 0 &&
                 <table>

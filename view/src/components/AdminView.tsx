@@ -45,6 +45,8 @@ const AdminView = (props: EditViewProps) => {
     // ? A boolean STATE VARIABLE used to show/hide the user definition (left) and table view (right) windows 
     const [showDefinitionField, setShowDefinitionField] = useState<boolean>(true)
 
+    const [priceFilter, setPriceFilter] = useState<string>('')
+
 
     // ? Is a state variable - an array of FieldRow objects, used to store the added data fields one by one by the user during relation definition
     const [fieldRows, setFieldRows] = useState<Array<FieldRow>>([
@@ -172,6 +174,14 @@ const AdminView = (props: EditViewProps) => {
                             <div className="row">
                                 <input type="text" value={searchString} onChange={(e) => setSearchString(e.target.value)} />
                                 <button onClick={getSearchResults}>Search</button>
+                            </div>
+                        </div>
+
+                        <div className="column" style={{ margin: 20 }}>
+                            <p>Filter by price here (&#60;=)</p>
+                            <div className="row">
+                                <input type="text" value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} />
+                                <button onClick={getFilteredTable}>Search</button>
                             </div>
                         </div>
                         <TableView relationView={props.relationView} />
@@ -428,6 +438,44 @@ const AdminView = (props: EditViewProps) => {
         const res = await api.deleteTable(relationName)
         props.onDeleteTable();
     }
+    // const [priceFilter, setPriceFilter] = useState<string>('')
+
+    async function getFilteredTable() {
+        const result = await api.filterTable({
+            price: parseInt(priceFilter)
+        }) as any[];
+        props.onRelationChange({
+            columns: props.relationView.columns,
+            rows: result.map(row => ({
+                id: row[0],
+                name: row[1],
+                host_id: row[2],
+                host_name: row[3],
+                neighbourhood: row[4],
+                room_type: row[5],
+                price: row[6],
+                availability: row[7]
+            }))
+        })
+
+    }
+    // const getResults = async () => {
+    //     const result = await api.searchEntry({
+    //         searchString: searchString
+    //     }) as any[];
+    //     props.setSearchString(result.map(row => ({
+    //         id: row[0],
+    //         name: row[1],
+    //         host_id: row[2],
+    //         host_name: row[3],
+    //         neighbourhood: row[4],
+    //         room_type: row[5],
+    //         price: row[6],
+    //         availability: row[7]
+    //     })))
+    //     //console.log(result)
+    //     //props.setSearchResults()
+    // }
 
 }
 

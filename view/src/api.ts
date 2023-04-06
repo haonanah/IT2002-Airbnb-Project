@@ -108,3 +108,16 @@ export async function deleteTable(tableName: any) {
     return false
     
 }
+
+export async function filterTable(filterValue: any) {
+    let res = await api.post("/table-filter", filterValue)
+    console.log(res)
+    if (res.ok) {
+        console.log("Filtered successfully!")
+        if (res.data) {
+            return res.data
+        }
+    }
+    alert("Failed to filter the given entry!")
+    return false
+}
