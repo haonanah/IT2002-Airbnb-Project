@@ -373,7 +373,7 @@ def filter_table():
     #     results = [list(row) for row in result.fetchall()]
     #     return json.dumps(results)
     
-def generate_filter_table_statement(table: Dict):  #filter table according to the price value. It will be less than input
+def generate_filter_table_statement(table: Dict):
     # ? First key is the name of the table
     # table_name = table["name"]
     # ? Table body itself is a JSON object mapping field/column names to their values
