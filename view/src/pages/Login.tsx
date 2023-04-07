@@ -126,6 +126,13 @@ export default function Login() {
             }
         }) as any
         console.log(user);
+
+        if (!user || user.length <= 0 || user[0].length != 3) { 
+           alert("Invalid username or password!");
+           return
+        }
+
+
         if (user && user.length > 0 && user[0].length === 3) { //idk why its like t his too :/
             if (user[0][2] === 'admin')  navigate("/admin");
             else if (user[0][2] === 'user')  navigate("/users");
