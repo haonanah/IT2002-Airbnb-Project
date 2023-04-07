@@ -100,9 +100,13 @@ export default function Login() {
 
         } else {
             if (adminCode.length > 0 && adminCode === ADMIN_CODE) {
+                alert("Admin signed up successfully")
                 return { ...credentials, role: 'admin' }
             }
+            else{
+                alert("User signed up successfully")
             return { ...credentials, role: 'user' }
+            }
         }
     }
 
