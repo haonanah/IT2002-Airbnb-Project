@@ -14,7 +14,7 @@ export default function UserView(props: EditViewProps) {
     const [searchString, setSearchString] = useState<string>('')
     const [priceFilter, setPriceFilter] = useState<string>('')
 
-    const getSearchResults = async () => {
+    const getSearchResults = async () => { //calls searchEntry from api to match serach string before mapping it the the respetive columns before passing into setserachresult function
         const result = await api.searchEntry({
             searchString: searchString
         }) as any[];
@@ -31,7 +31,7 @@ export default function UserView(props: EditViewProps) {
         //console.log(result)
         //props.setSearchResults()
     }
-    async function getFilteredTable() {
+    async function getFilteredTable() {//reterieve filtered rows from a table by calling api.filterTable given priceFilter value
         const result = await api.filterTable({
             price: parseInt(priceFilter)
         }) as any[];
@@ -59,7 +59,7 @@ export default function UserView(props: EditViewProps) {
             </div>
 
             <div className="column" style={{ margin: 20 }}>
-                <p>Filter by price here (&#60;=)</p>
+                <p>Filter by price here (&#60;)</p>
                 <div className="row">
                     <input type="text" value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} />
                     <button onClick={getFilteredTable}>Search</button>

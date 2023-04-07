@@ -4,7 +4,7 @@ interface TableViewProps {
     relationView: RelationView
 }
 
-const TableView = (props: TableViewProps) => {
+const TableView = (props: TableViewProps) => { //view of the table
     return (
         <div id="sub-view">
             <p>Listings:</p>

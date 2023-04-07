@@ -12,7 +12,7 @@ interface FieldRowProps {
     onFieldDeletion: (id: number) => void
 }
 
-const FieldRowView = (props: FieldRowProps) => {
+const FieldRowView = (props: FieldRowProps) => { //receive props and callback functions to handle user input
     return (
         <div className="horizontal-alignment">
             <div className="horizontal-alignment">

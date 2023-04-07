@@ -106,11 +106,11 @@ const AdminView = (props: EditViewProps) => {
     const [searchString, setSearchString] = useState<string>('')
     const [currentRelationName] = useState<string>('airbnb');
 
-    const getSearchResults = async () => {
+    const getSearchResults = async () => { //awaits result of call to an serachEntry API which takes in serach string and result is returned as any[]
         const result = await api.searchEntry({
             searchString: searchString
         }) as any[];
-        props.setSearchString(result.map(row => ({
+        props.setSearchString(result.map(row => ({ //maps the arry of results to the given properties 
             id: row[0],
             name: row[1],
             host_id: row[2],
@@ -178,7 +178,7 @@ const AdminView = (props: EditViewProps) => {
                         </div>
 
                         <div className="column" style={{ margin: 20 }}>
-                            <p>Filter by price here (&#60;=)</p>
+                            <p>Filter by price here (&#60;)</p>
                             <div className="row">
                                 <input type="text" value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} />
                                 <button onClick={getFilteredTable}>Search</button>
@@ -245,7 +245,7 @@ const AdminView = (props: EditViewProps) => {
     )
 
 
-    function handleFieldRowAddition(id: number) {
+    function handleFieldRowAddition(id: number) { //take in id, find index of object in array given id before adding through splice
         let _fieldRows = [...fieldRows]
         let idx = _fieldRows.findIndex(fieldRow => fieldRow.id === id)
         let newId = _fieldRows.length + 1
@@ -259,14 +259,14 @@ const AdminView = (props: EditViewProps) => {
     }
 
 
-    function handleFieldRowDeletion(id: number) {
+    function handleFieldRowDeletion(id: number) {//take in id, find index of object in array given id before removing through splice
         let _fieldRows = [...fieldRows]
         let idx = _fieldRows.findIndex(fieldRow => fieldRow.id === id)
         _fieldRows.splice(idx, 1)
         setFieldRows(_fieldRows)
     }
 
-    function handleFieldNameEdit(id: number, fieldName: string) {
+    function handleFieldNameEdit(id: number, fieldName: string) { //take in id and fieldname, find index of object in array given id before updating the fieldname
         let _fieldRows = [...fieldRows]
         let idx = _fieldRows.findIndex(fieldRow => fieldRow.id === id)
         _fieldRows[idx].fieldName = fieldName
@@ -274,7 +274,7 @@ const AdminView = (props: EditViewProps) => {
         setFieldRows(_fieldRows)
     }
 
-    function handleFieldTypeEdit(id: number, fieldType: string) {
+    function handleFieldTypeEdit(id: number, fieldType: string) { //take in id and fieldtype, find index of object in array given id before updating the fieldtype 
         let _fieldRows = [...fieldRows]
         let idx = _fieldRows.findIndex(fieldRow => fieldRow.id === id)
         _fieldRows[idx].fieldType = fieldType
@@ -283,23 +283,24 @@ const AdminView = (props: EditViewProps) => {
 
     }
 
-    function handleRelationNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    function handleRelationNameChange(event: React.ChangeEvent<HTMLInputElement>) { //take an prameter and sets relationName to input
         setRelationName(event.target.value)
     }
 
-    function handleInsertionValueEdit(event: React.ChangeEvent<HTMLInputElement>, col: string) {
+    function handleInsertionValueEdit(event: React.ChangeEvent<HTMLInputElement>, col: string) {//take two prameter and update value of the column with insertion values 
+        setRelationName(event.target.value)
         let _insertionValues = { ...insertionValues }
         _insertionValues[col] = event.target.value
         setInsertionValues(_insertionValues)
     }
 
-    function handleUpdateValueEdit(event: React.ChangeEvent<HTMLInputElement>, col: string) {
+    function handleUpdateValueEdit(event: React.ChangeEvent<HTMLInputElement>, col: string) { //take two prameter and update value of the column with updatevalues 
         let _updateValues = { ...updateValues }
         _updateValues[col] = event.target.value
         setUpdateValues(_updateValues)
     }
 
-    async function hanldeRelationCreation() {
+    async function hanldeRelationCreation() { //create new relation given input and call respetive api and methods 
         let body: { [name: string]: string } = {}
 
         fieldRows.forEach(fieldRow => {
@@ -336,7 +337,7 @@ const AdminView = (props: EditViewProps) => {
         setShowDefinitionField(false)
     }
 
-    async function handleEntryInsertion() {
+    async function handleEntryInsertion() { //handle insertion of new entry into data base
         let valueTypesq: StringMap = {}
         for (let key of Object.keys(insertionValues)) {
             let fieldValue = fieldRows.find(row => row.fieldName == key)
@@ -352,11 +353,6 @@ const AdminView = (props: EditViewProps) => {
         }
 
 
-        // let insertionData = {
-        //     name: currentRelationName,
-        //     body: {id: 123, name: insertionValues.name, host_id: parseInt(insertionValues.host_id), host_name: insertionValues.host_name, neighbourhood: insertionValues.neighbourhood, room_type: insertionValues.room_type, price: parseInt(insertionValues.price), availability: parseInt(insertionValues.availability)},
-        //     valueTypes: fieldRows.map(x => DataTypes[x.fieldType])
-        // }
         console.log(insertionData)
         let success = await api.insertEntry(insertionData)
         console.log(success)
@@ -371,29 +367,9 @@ const AdminView = (props: EditViewProps) => {
         setInsertionValues(newValues)
         props.onRelationChange(latestRelation)
     }
-    // async function handleEntryInsertion() {
-    //     let valueTypes: StringMap = {}
-    //     for (let key of Object.keys(insertionValues)) {
-    //         let fieldValue = fieldRows.find(row => row.fieldName == key)
-    //         if (fieldValue) {
-    //             valueTypes[key] = DataTypes[fieldValue.fieldType]
-    //         }
-    //     }
 
-    //     let insertionData = {
-    //         name: currentRelationName,
-    //         body: {id: "123", name: insertionValues.name, host_id: insertionValues.host_id, host_name: insertionValues.host_name, neighbourhood: insertionValues.neighbourhood, room_type: insertionValues.room_type, price: insertionValues.price, availability: insertionValues.availability},
-    //         valueTypes: fieldRows.map(x => DataTypes[x.fieldType])
-    //     }
-    //     let success = await api.insertEntry(insertionData)
-    //     if (!success) {
-    //         return
-    //     }
-    //     let latestRelation = await api.getRelation(relationName)
-    //     props.onRelationChange(latestRelation)
-    // }
 
-    async function handleEntryUpdate() {
+    async function handleEntryUpdate() { //handle updates of existing entries in database
         let updateData = {
             name: currentRelationName,
             body: updateValues,
@@ -413,7 +389,7 @@ const AdminView = (props: EditViewProps) => {
         setUpdateValues(newValues)
     }
 
-    async function handleEntryDeletion() {
+    async function handleEntryDeletion() { //handle deletion of existing entries in database
         let deletionData = {
             relationName: currentRelationName,
             deletionId
@@ -434,13 +410,13 @@ const AdminView = (props: EditViewProps) => {
         setDeletionId(_deletionId)
     }
 
-    async function handleDeletedTable(event: any) {
+    async function handleDeletedTable(event: any) { //handle deletion of table in database
         const res = await api.deleteTable(relationName)
         props.onDeleteTable();
     }
-    // const [priceFilter, setPriceFilter] = useState<string>('')
 
-    async function getFilteredTable() {
+
+    async function getFilteredTable() { //calls filterTable from the api to get a filtered table based on price filter
         const result = await api.filterTable({
             price: parseInt(priceFilter)
         }) as any[];
@@ -459,23 +435,6 @@ const AdminView = (props: EditViewProps) => {
         })
 
     }
-    // const getResults = async () => {
-    //     const result = await api.searchEntry({
-    //         searchString: searchString
-    //     }) as any[];
-    //     props.setSearchString(result.map(row => ({
-    //         id: row[0],
-    //         name: row[1],
-    //         host_id: row[2],
-    //         host_name: row[3],
-    //         neighbourhood: row[4],
-    //         room_type: row[5],
-    //         price: row[6],
-    //         availability: row[7]
-    //     })))
-    //     //console.log(result)
-    //     //props.setSearchResults()
-    // }
 
 }
 

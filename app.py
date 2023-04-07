@@ -111,7 +111,7 @@ def insert_into_table():
         db.rollback()
         return Response(str(e), 403)
 
-@app.post("/table-retrieve")
+@app.post("/table-retrieve") # endpoint that handles entry reterieve reqeust
 # ? a flask decorator listening for POST requests at the url /table-insert and handles the entry insertion into the given table/relation
 # * You might wonder why PUT or a similar request header was not used here. Fundamentally, they act as POST. So the code was kept simple here
 def retrieve_data_from_table():
@@ -139,7 +139,7 @@ def retrieve_data_from_table():
         return Response(str(e), 403)
 
 
-@app.post("/table-update")
+@app.post("/table-update")# endpoint that handles entry update reqeust
 # ? a flask decorator listening for POST requests at the url /table-update and handles the entry updates in the given table/relation
 def update_table():
     # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
@@ -155,7 +155,7 @@ def update_table():
         return Response(str(e), 403)
 
 
-@app.post("/entry-delete")
+@app.post("/entry-delete") # endpoint that handles entry delete reqeust
 # ? a flask decorator listening for POST requests at the url /entry-delete and handles the entry deletion in the given table/relation
 def delete_row():
     # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
@@ -170,7 +170,7 @@ def delete_row():
         db.rollback()
         return Response(str(e), 403)
     
-@app.post("/delete-table")
+@app.post("/delete-table") #end point that handles delete request 
 def delete_table():
     data = request.data.decode()
     try:
@@ -184,7 +184,7 @@ def delete_table():
         db.rollback()
         return Response(str(e), 403)
 
-def generate_table_return_result(res):
+def generate_table_return_result(res): #takes result object from select query exectued on a database table and generate a JSON object with table data
     # ? An empty Python list to store the entries/rows/tuples of the relation/table
     rows = []
 
@@ -215,7 +215,7 @@ def generate_table_return_result(res):
     # ? Returns the stringified JSON object
     return json.dumps(output)
 
-def generate_delete_statement(details: Dict):
+def generate_delete_statement(details: Dict): #generate SQL deletion statment
     # ? Fetches the entry id for the table name
     table_name = details["relationName"]
     id = details["deletionId"]
@@ -224,12 +224,12 @@ def generate_delete_statement(details: Dict):
     return sqlalchemy.text(statement)
 
 
-def delete_table_helper(table_name):
+def delete_table_helper(table_name): #generate SQL delete table statment
     statement = f"DROP TABLE {table_name}"
     return sqlalchemy.text(statement)
 
 
-def generate_update_table_statement(update: Dict):
+def generate_update_table_statement(update: Dict): #generate SQL update table statment
 
     # ? Fetching the table name, entry/tuple id and the update body
     table_name = update["name"]
@@ -247,7 +247,7 @@ def generate_update_table_statement(update: Dict):
     return sqlalchemy.text(statement)
 
 
-def generate_insert_table_statement(insertion: Dict):
+def generate_insert_table_statement(insertion: Dict): #generate SQL insert into table statment
     # ? Fetching table name and the rows/tuples body object from the request
     table_name = insertion["name"]
     body = insertion["body"]
@@ -275,7 +275,7 @@ def generate_insert_table_statement(insertion: Dict):
     statement = statement + column_names+" VALUES "+column_values+";"
     return sqlalchemy.text(statement)
 
-def generate_get_table_data_statement(insertion: Dict): 
+def generate_get_table_data_statement(insertion: Dict): #generate SQL select statment for username, password and role from db for authenticaiton
     #must check if other functions use this, as im only selecting username and password
     # ? Fetching table name and the rows/tuples body object from the request
     table_name = insertion["name"]
@@ -302,7 +302,7 @@ def generate_get_table_data_statement(insertion: Dict):
     return sqlalchemy.text(statement)
 
 
-def generate_create_table_statement(table: Dict):
+def generate_create_table_statement(table: Dict): #generate SQL table creation statment
     # ? First key is the name of the table
     table_name = table["name"]
     # ? Table body itself is a JSON object mapping field/column names to their values
@@ -317,7 +317,7 @@ def generate_create_table_statement(table: Dict):
     statement = statement[:-1] + ");"
     return sqlalchemy.text(statement)
 
-@app.post("/table-search")
+@app.post("/table-search") #endpoint that get POST request to search for table
 # ? a flask decorator listening for POST requests at the url /table-update and handles the entry updates in the given table/relation
 def serach_table():
     # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
@@ -333,7 +333,7 @@ def serach_table():
         db.rollback()
         return Response(str(e), 403)
 
-def generate_search_table_statement(table: Dict):
+def generate_search_table_statement(table: Dict): #generate SQL code to search within the table under columns neighbourhood and roomtype
     # ? First key is the name of the table
     # table_name = table["name"]
     # ? Table body itself is a JSON object mapping field/column names to their values
@@ -350,7 +350,7 @@ def generate_search_table_statement(table: Dict):
     return sqlalchemy.text(statement)
 
 
-@app.post("/table-filter")
+@app.post("/table-filter") # endpoint that gets post request to filter for price within the table
 # ? a flask decorator listening for POST requests at the url /table-update and handles the entry updates in the given table/relation
 def filter_table():
     # ? Steps are common in all of the POST behaviors. Refer to the statement generation for the explanatory
@@ -373,7 +373,7 @@ def filter_table():
     #     results = [list(row) for row in result.fetchall()]
     #     return json.dumps(results)
     
-def generate_filter_table_statement(table: Dict):
+def generate_filter_table_statement(table: Dict):  #filter table according to the price value. It will be less than input
     # ? First key is the name of the table
     # table_name = table["name"]
     # ? Table body itself is a JSON object mapping field/column names to their values

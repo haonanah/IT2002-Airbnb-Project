@@ -24,8 +24,8 @@ export async function createRelation(relationData: any) {
 }
 
 // ? A GET method to obtain your relation from the backend
-export async function getRelation(relationName: string) {
-    let res = await api.get("/table", { "name": relationName })
+export async function getRelation(relationName: string) { // wrapper function around API call to retrieve data from DB. Takes name of relation as parameter and makes a HTTP GET request to the /table endpoint of API sever 
+    let res = await api.get("/table", { "name": relationName })// with the name of the relation as query parameter
     if (res.ok) {
         return res.data as Promise<RelationView>
     } else {
@@ -38,7 +38,7 @@ export async function getRelation(relationName: string) {
 
 }
 
-export async function insertEntry(entry: any) {
+export async function insertEntry(entry: any) { // sends a POST request to server end point at "/table-insert", alert status 
     let res = await api.post("/table-insert", entry)
     if (res.ok) {
         console.log("Inserted successfully!")
@@ -48,7 +48,7 @@ export async function insertEntry(entry: any) {
     return false
 }
 
-export async function getEntry(entry: any) {
+export async function getEntry(entry: any) { // sends a POST request to server end point at "/table-retrieve", alert status 
     let res = await api.post("/table-retrieve", entry)
     console.log(res)
     if (res.ok) {
@@ -63,7 +63,7 @@ export async function getEntry(entry: any) {
     return false
 }
 
-export async function searchEntry(entry: any) {
+export async function searchEntry(entry: any) { // sends a POST request to server end point at "/table-search", alert status 
     let res = await api.post("/table-search", entry)
     console.log(res)
     if (res.ok) {
@@ -78,7 +78,7 @@ export async function searchEntry(entry: any) {
     return false
 }
 
-export async function updateEntry(entry: any) {
+export async function updateEntry(entry: any) { // sends a POST request to server end point at "/table-update", alert status 
     let res = await api.post("/table-update", entry)
     if (res.ok) {
         console.log("Inserted successfully!")
@@ -88,7 +88,7 @@ export async function updateEntry(entry: any) {
     return false
 }
 
-export async function deleteEntry(deletionData: any) {
+export async function deleteEntry(deletionData: any) { // sends a POST request to server end point at "/entry-delete", alert status 
     let res = await api.post("/entry-delete", deletionData)
     if (res.ok) {
         console.log("Deleted successfully!")
@@ -98,7 +98,7 @@ export async function deleteEntry(deletionData: any) {
     return false
 }
 
-export async function deleteTable(tableName: any) {
+export async function deleteTable(tableName: any) {// sends a POST request to server end point at "/delete-table", alert status 
     let res = await api.post("/delete-table", {name: tableName})
     if (res.ok) {
         console.log("Deleted successfully!")
@@ -109,7 +109,7 @@ export async function deleteTable(tableName: any) {
     
 }
 
-export async function filterTable(filterValue: any) {
+export async function filterTable(filterValue: any) { // sends a POST request to server end point at "/table-filter", alert status 
     let res = await api.post("/table-filter", filterValue)
     console.log(res)
     if (res.ok) {

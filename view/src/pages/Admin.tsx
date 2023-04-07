@@ -28,7 +28,7 @@ function App() {
     getDatabaseData();
   }, [])
 
-  const getDatabaseData = async () => {
+  const getDatabaseData = async () => { // retrive data from db 
     const res = await api.getRelation("airbnb")
     setCurrentRelationView({
       columns: res.columns,
@@ -36,7 +36,7 @@ function App() {
     })
   }
 
-  function setSearchResults(rows: Array<{ [key: string]: any }>) {
+  function setSearchResults(rows: Array<{ [key: string]: any }>) { //load the view 
     setCurrentRelationView({
       ...currentRelationView,
       rows
@@ -56,7 +56,7 @@ function App() {
   )
 
   // ? A props funcion for the EditView - keeping the relation view for up-to-date to be displayed on the right side of the window
-  function handleRelationViewUpdate(relationView: RelationView) {
+  function handleRelationViewUpdate(relationView: RelationView) { //used for displaying and handling updates into relation
     // ? Here a few data type handling is done in order to properly diplay the BOOLEAN types since HTML visualizes true and false types as blank
     // ? First loop iterates through the displayed rows
     for (let i = 0; i < relationView.rows.length; i++) {
@@ -76,7 +76,7 @@ function App() {
     // airbnbdata = relationView.rows
   }
 
-  function deleteTable() {
+  function deleteTable() { // delete entire table of values 
     setCurrentRelationView({
       columns: [],
       rows: []

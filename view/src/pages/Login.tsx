@@ -46,7 +46,7 @@ export default function Login() {
         }
     }
 
-    const insertAirbnbData = async () => {
+    const insertAirbnbData = async () => { //ensure relation exist and has data. inserts data into airbnb relation
         const res = await api.getRelation("airbnb");
         console.log(res)
         if (res.columns.length === 0) {
@@ -73,7 +73,7 @@ export default function Login() {
         })
     }
 
-    const onCreateUser = async () => {
+    const onCreateUser = async () => { // Creates a user with a specified role (either "admin" or "user") and inserts the the data into a database using an API call.
         const user = createUserWithRole();
         if (user) {
             await api.insertEntry({
@@ -94,35 +94,34 @@ export default function Login() {
         }
     }
 
-    const createUserWithRole = () => {
+    const createUserWithRole = () => { // check if admin code is valid
         if (adminCode.length > 0 && adminCode !== ADMIN_CODE) {
             alert("Invalid admin code!")
 
         } else {
-            if (adminCode.length > 0 && adminCode === ADMIN_CODE) {
+            if (adminCode.length > 0 && adminCode === ADMIN_CODE) { // if admin code valid, it would be a admin account
                 alert("Admin signed up successfully")
                 return { ...credentials, role: 'admin' }
             }
             else{
-                alert("User signed up successfully")
+                alert("User signed up successfully") // else it would be a user account
             return { ...credentials, role: 'user' }
             }
         }
     }
 
-    const clearData = () => {
+    const clearData = () => { // resets state of credentials and admin code to empty strings 
         setCredentials({ username: '', password: '' })
         setAdminCode('')
     }
 
-    const onLogin = async () => {
+    const onLogin = async () => { // makes API call to retrieve user data from the DB 
         const user = await api.getEntry({
             name: "users",
             body: {
                 username: credentials.username,
                 password: credentials.password,
-                // username: "user1",
-                // password: "user1",
+
             },
             valueTypes: {
                 username: "TEXT",
@@ -131,33 +130,16 @@ export default function Login() {
         }) as any
         console.log(user);
 
-        if (!user || user.length <= 0 || user[0].length != 3) { 
-           alert("Invalid username or password!");
+        if (!user || user.length <= 0 || user[0].length != 3) { //check if user, password match 
            return
         }
 
 
-        if (user && user.length > 0 && user[0].length === 3) { //idk why its like t his too :/
+        if (user && user.length > 0 && user[0].length === 3) { // check if the person performing log in is a admin or user before redirecting them to the correct page
+            alert("Invalid username or password!");
             if (user[0][2] === 'admin')  navigate("/admin");
             else if (user[0][2] === 'user')  navigate("/users");
         }
-
-        // const currentUsers = localStorage.getItem("users");
-        // if (currentUsers) {
-        //     const obj = JSON.parse(currentUsers);
-        //     const hasUser = obj.users.filter((x: any) => x.username === credentials.username && x.password === credentials.password)
-        //     if (hasUser && hasUser.length > 0) {
-        //         if (hasUser[0].role === 'admin') {
-        //             navigate("/admin")
-        //         } else {
-        //             navigate("/users")
-        //         }
-        //     } else {
-        //         alert("Wrong username and/or password")
-        //     }
-        // } else {
-        //     alert("Wrong username and/or password")
-        // }
     }
 
     return (
